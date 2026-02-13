@@ -12,7 +12,7 @@ import {
   Check,
   CreditCard,
   File,
-  FileDown,
+  Download,
 } from 'lucide-react';
 import { PriceService } from '../services/PriceService';
 import { useLanguage } from '../LanguageContext';
@@ -62,9 +62,9 @@ const COUNTRIES = [
 
 const DOCS = {
   AGB: { title: 'AGB', content: 'Текст AGB...' },
-  WIDERRUF: { title: 'Widerrufsbelehrung', content: 'Текст условий возврата...' },
-  MANDAT: { title: 'Mandatsvereinbarung', content: 'Текст мандатного соглашения...' },
-  RVG: { title: 'Honorarvereinbarung', content: 'Текст гонорарного соглашения...' },
+  WIDERRUF: { title: 'Widerrufsbelehrung', content: 'Текст Widerrufsbelehrung...' },
+  MANDAT: { title: 'Mandatsvereinbarung', content: 'Текст Mandatsvereinbarung...' },
+  RVG: { title: 'Honorarvereinbarung (§ 3a RVG)', content: 'Текст Honorarvereinbarung...' },
   EXECUTION: { title: 'Sofortige Aufnahme der Tätigkeit', content: 'Текст поручения...' },
   PRIVACY: { title: 'Datenschutzerklärung', content: 'Текст политики...' },
 };
@@ -103,58 +103,52 @@ const modalContent = {
     title: 'ОФОРМЛЕНИЕ ЗАКАЗА', subtitle: 'Пакет №2 «Самостоятельный»',
     placeholders: { name: 'ИМЯ *', name_ph: 'Имя', surname: 'ФАМИЛИЯ *', surname_ph: 'Фамилия', email: 'EMAIL *', email_ph: 'email@example.com', phone: 'ТЕЛЕФОН *', phone_ph: '123 456 789' },
     mandatory_hint: '* Поля, отмеченные звёздочкой, обязательны для заполнения',
-    family: { title: 'СЕМЕЙНЫЙ ФОРМАТ', spouse: 'Супруг/Супруга', children: 'Дети', info: 'Базовый семейный формат включает до 3 человек. Каждый последующий участник рассчитывается отдельно.' },
+    family: { 
+      title: 'СЕМЕЙНЫЙ ФОРМАТ', spouse: 'Супруг/Супруга', children: 'Дети', 
+      info: 'Базовый семейный формат включает до 3 человек (основной заявитель + 2 участника). Каждый последующий участник увеличивает объём юридической работы и рассчитывается отдельно как доплата в сумме 50% от стоимости базового пакета.' 
+    },
     credits: { title: 'РАНЕЕ ПРИОБРЕТЁННЫЕ ПАКЕТЫ (ЗАЧЁТ)', p1_label: 'Пакет №1 «Стартовый»', p1_summary: 'Зачет уровня пакета №1 «Стартовый»' },
     summary: { base: 'БАЗОВАЯ ЦЕНА ПАКЕТА №2', family_base: 'Базовый семейный формат (до 3 чел.)', family_extra: 'Доп. участники', person_short: 'чел.', family_total: 'Итого семейный тариф:', total: 'ИТОГО К ОПЛАТЕ' },
     offer_scope: 'Это предложение предназначено исключительно для потребителей в понимании § 13 BGB.',
     p1_precondition: 'Бронирование этого пакета возможно только при наличии положительного результата в рамках Пакета №1.',
     privacy_link: 'Политика конфиденциальности',
     button: 'ПРОВЕРИТЬ И ПРОДОЛЖИТЬ', loading: 'СОЗДАНИЕ ЗАКАЗА...', package_name_order: 'Пакет №2 «Самостоятельный»',
-    errors: {
-      not_found: 'Обязательным условием для оформления данного заказа является наличие положительного заключения в рамках Пакета №1.',
-      pending: 'Процедура оценки в рамках Пакета №1 еще не завершена.',
-      negative: 'По данному Email наличие положительного результата оценки не подтверждено.',
-      generic: 'Ошибка проверки статуса. Повторите попытку.'
-    },
-    btn_close: 'Закрыть'
+    errors: { not_found: 'Обязательным условием для оформления данного заказа является наличие положительного заключения в рамках Пакета №1.', pending: 'Процедура оценки в рамках Пакета №1 еще не завершена.', negative: 'По данному Email наличие положительного результата оценки не подтверждено.', generic: 'Ошибка проверки статуса. Повторите попытку.' },
+    btn_close: 'Закрыть', btn_download: 'Скачать PDF'
   },
   de: {
     title: 'BESTELLUNG', subtitle: 'Paket №2 «Selbstständig»',
     placeholders: { name: 'VORNAME *', name_ph: 'Vorname', surname: 'NACHNAME *', surname_ph: 'Nachname', email: 'E-MAIL *', email_ph: 'email@example.com', phone: 'TELEFON *', phone_ph: '123 456 789' },
-    mandatory_hint: '* Pflichtfelder',
-    family: { title: 'FAMILIENFORMAT', spouse: 'Ehepartner', children: 'Kinder', info: 'Das Standard-Familienformat umfasst bis zu 3 Personen.' },
+    mandatory_hint: '* Mit Sternchen markierte Felder sind Pflichtfelder',
+    family: { 
+      title: 'FAMILIENFORMAT', spouse: 'Ehepartner', children: 'Kinder', 
+      info: 'Das Standard-Familienformat umfasst bis zu 3 Personen (Hauptantragsteller + 2 Teilnehmer). Jeder weitere Teilnehmer erhöht den juristischen Arbeitsaufwand und wird separat mit einem Aufschlag von 50 % des Basispaketpreises berechnet.' 
+    },
     credits: { title: 'BEREITS ERWORBENE PAKETE (VERRECHNUNG)', p1_label: 'Paket №1 «Start»', p1_summary: 'Anrechnung Paket-Level №1 «Start»' },
     summary: { base: 'BASISPREIS PAKET №2', family_base: 'Standard-Familienformat (bis 3 Pers.)', family_extra: 'Zusätzliche Teilnehmer', person_short: 'Pers.', family_total: 'Summe Familientarif:', total: 'GESAMTSUMME' },
     offer_scope: 'Dieses Angebot richtet sich ausschließlich an Verbraucher im Sinne des § 13 BGB.',
     p1_precondition: 'Die Buchung dieses Pakets ist nur möglich, wenn im Rahmen von Paket 1 ein positives Ergebnis festgestellt wurde.',
     privacy_link: 'Datenschutzerklärung',
     button: 'PRÜFEN UND FORTFAHREN', loading: 'ERSTELLUNG...', package_name_order: 'Paket №2 «Selbstständig»',
-    errors: {
-      not_found: 'Zwingende Voraussetzung für die Bestellung dieses Pakets ist ein positives Ergebnis im Rahmen von Paket Nr. 1.',
-      pending: 'Das Verfahren der Ersteinschätzung ist noch nicht abgeschlossen.',
-      negative: 'Für diese E-Mail konnte das Vorliegen eines positiven Ergebnisses nicht bestätigt werden.',
-      generic: 'Fehler bei der Überprüfung. Bitte versuchen Sie es erneut.'
-    },
-    btn_close: 'Schließen'
+    errors: { not_found: 'Zwingende Voraussetzung für die Bestellung dieses Pakets ist ein positives Ergebnis im Rahmen von Paket Nr. 1.', pending: 'Das Verfahren der Ersteinschätzung ist noch nicht abgeschlossen.', negative: 'Für diese E-Mail konnte das Vorliegen eines positiven Ergebnisses nicht bestätigt werden.', generic: 'Fehler bei der Überprüfung. Bitte versuchen Sie es erneut.' },
+    btn_close: 'Schließen', btn_download: 'Als PDF speichern'
   },
   ua: {
     title: 'ОФОРМЛЕННЯ ЗАМОВЛЕННЯ', subtitle: 'Пакет №2 «Самостійний»',
     placeholders: { name: "ІМ'Я *", name_ph: "Ім'я", surname: 'ПРІЗВИЩЕ *', surname_ph: 'Прізвище', email: 'EMAIL *', email_ph: 'email@example.com', phone: 'ТЕЛЕФОН *', phone_ph: '123 456 789' },
-    mandatory_hint: "* Обов'язкові поля",
-    family: { title: 'СЕМЕЙНИЙ ФОРМАТ', spouse: 'Чоловік/Дружина', children: 'Діти', info: 'Базовий сімейний формат включає до 3 осіб.' },
+    mandatory_hint: "* Поля, позначені зірочкою, є обов'язковими",
+    family: { 
+      title: 'СЕМЕЙНИЙ ФОРМАТ', spouse: 'Чоловік/Дружина', children: 'Діти', 
+      info: 'Базовий сімейний формат включає до 3 осіб (основний заявник + 2 учасники). Кожен наступний учасник збільшує обсяг юридичної роботи та розраховується окремо як доплата у сумі 50% від вартості базового пакета.' 
+    },
     credits: { title: 'РАНІШЕ ПРИДБАНІ ПАКЕТИ (ЗАРАХУВАННЯ)', p1_label: 'Пакет №1 «Стартовий»', p1_summary: 'Зарахування рівня пакету №1 «Стартовий»' },
     summary: { base: 'БАЗОВА ЦІНА ПАКЕТУ №2', family_base: 'Базовий сімейний формат (до 3 осіб)', family_extra: 'Дод. учасники', person_short: 'осіб', family_total: 'Разом сімейний тариф:', total: 'РАЗОМ ДО СПЛАТИ' },
     offer_scope: 'Ця пропозиція призначена виключно для споживачів у розумінні § 13 BGB.',
     p1_precondition: 'Бронювання цього пакета можливе лише за наявності позитивного результату в рамках Пакета №1.',
     privacy_link: 'Політика конфіденційності',
     button: 'ПЕРЕВІРИТИ ТА ПРОДОВЖИТИ', loading: 'СТВОРЕННЯ...', package_name_order: 'Пакет №2 «Самостійний»',
-    errors: {
-      not_found: "Обов'язковою умовою для оформлення цього замовлення є наявність позитивного висновку в рамках Пакету №1.",
-      pending: 'Процедура оцінки в рамках Пакету №1 ще не завершена.',
-      negative: 'За даним Email наявність позитивного результату не підтверджена.',
-      generic: 'Помилка перевірки. Спробуйте ще раз.'
-    },
-    btn_close: 'Закрити'
+    errors: { not_found: "Обов'язковою умовою для оформлення цього замовлення є наявність позитивного висновку в рамках Пакету №1.", pending: 'Процедура оцінки в рамках Пакету №1 ще не завершена.', negative: 'За даним Email наявність позитивного результату не підтверджена.', generic: 'Помилка перевірки. Спробуйте ще раз.' },
+    btn_close: 'Закрити', btn_download: 'Завантажити PDF'
   },
 };
 
@@ -178,21 +172,21 @@ export const P2PreCheckoutModal: React.FC<P2PreCheckoutModalProps> = ({ onClose,
   const [isFamilyActive, setIsFamilyActive] = useState(false);
   const [familyData, setFamilyData] = useState({ spouse: 0, children: 0 });
   const [selectedCredits, setSelectedCredits] = useState<number[]>([]);
-  
   const [consentA, setConsentA] = useState(false);
   const [consentB, setConsentB] = useState(false);
-
   const [activeDoc, setActiveDoc] = useState<string | null>(null);
   const [isChecking, setIsChecking] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
 
   const extraMembers = isFamilyActive ? familyData.spouse + familyData.children : 0;
+  
   const isNameValid = formData.name.trim().length > 1;
   const isSurnameValid = formData.surname.trim().length > 1;
   const isEmailValid = formData.email.includes('@');
   const isPhoneValid = formData.phone.replace(/\D/g, '').length > 5;
   const areLegalsValid = consentA && consentB;
+  
   const isFormValid = isNameValid && isSurnameValid && isEmailValid && isPhoneValid;
 
   const pricing = useMemo(() => PriceService.calculateUpgrade(2, selectedCredits, extraMembers), [selectedCredits, extraMembers]);
@@ -227,11 +221,7 @@ export const P2PreCheckoutModal: React.FC<P2PreCheckoutModalProps> = ({ onClose,
   };
 
   const DocLink = ({ code, text }: { code: string; text: string }) => (
-    <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveDoc(code); }} className="text-blue-600 hover:text-blue-800 underline cursor-pointer hover:bg-blue-50 rounded px-1 transition-colors font-bold inline-flex items-center gap-1">{text}</span>
-  );
-
-  const DownloadIcon = ({ code }: { code: string }) => (
-    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); alert(`Download: ${code}.pdf`); }} className="p-1 text-slate-400 hover:text-blue-600 transition-colors inline-block align-middle ml-1" title="PDF"><FileDown size={14} /></button>
+    <span onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveDoc(code); }} className="text-blue-600 hover:text-blue-800 underline cursor-pointer hover:bg-blue-50 rounded px-1 transition-colors font-bold">{text}</span>
   );
 
   return (
@@ -256,22 +246,12 @@ export const P2PreCheckoutModal: React.FC<P2PreCheckoutModalProps> = ({ onClose,
               <div className="relative sm:col-span-2" ref={dropdownRef}>
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">{t.placeholders.phone}</label>
                 <div className="relative flex">
-                  <button type="button" onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)} className={`flex items-center gap-2 px-3 border-y border-l rounded-l-xl bg-slate-50 hover:bg-slate-100 transition-colors ${showValidationErrors && !isPhoneValid ? 'border-red-500' : 'border-slate-200'}`}>
-                    <span className="text-xl leading-none">{selectedCountry.flag}</span>
-                    <ChevronDown size={12} className={`text-slate-400 transition-transform ${isCountryDropdownOpen ? 'rotate-180' : ''}`} />
-                  </button>
-                  <div className={`flex-1 flex items-center border rounded-r-xl bg-white border-l-0 ${showValidationErrors && !isPhoneValid ? 'border-red-500 bg-red-50' : formData.phone.length > 5 ? 'border-emerald-500 bg-emerald-50/30' : 'border-slate-200 focus-within:border-blue-900 focus-within:ring-2'}`}>
-                    <span className="pl-3 text-sm font-bold text-slate-500 select-none">{selectedCountry.dial}</span>
-                    <input type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/[^0-9\s]/g, '') })} className="w-full py-3.5 pl-2 pr-4 bg-transparent focus:outline-none text-sm font-medium" placeholder={t.placeholders.phone_ph} />
-                  </div>
+                  <button type="button" onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)} className={`flex items-center gap-2 px-3 border border-slate-200 border-r-0 rounded-l-xl bg-slate-50 hover:bg-slate-100 transition-colors ${showValidationErrors && !isPhoneValid ? 'border-red-500' : ''}`}><span className="text-xl leading-none">{selectedCountry.flag}</span><ChevronDown size={12} className={`text-slate-400 transition-transform ${isCountryDropdownOpen ? 'rotate-180' : ''}`} /></button>
+                  <div className={`flex-1 flex items-center border rounded-r-xl bg-white ${showValidationErrors && !isPhoneValid ? 'border-red-500 bg-red-50' : isPhoneValid && formData.phone.length > 5 ? 'border-emerald-500 bg-emerald-50/30' : 'border-slate-200'}`}><span className="pl-3 text-sm font-bold text-slate-500">{selectedCountry.dial}</span><input type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/[^0-9\s]/g, '') })} className="w-full py-3.5 pl-2 pr-4 bg-transparent focus:outline-none text-sm font-medium" placeholder={t.placeholders.phone_ph} /></div>
                   {isCountryDropdownOpen && (
                     <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border border-slate-100 z-[140] max-h-60 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-2">
                       {COUNTRIES.map((c) => (
-                        <button key={c.code} onClick={() => { setSelectedCountry(c); setIsCountryDropdownOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-blue-50 transition-colors text-left border-b border-slate-50 last:border-0">
-                          <span className="text-2xl">{c.flag}</span>
-                          <div className="flex flex-col"><span className="text-xs font-bold text-slate-900">{c.name}</span><span className="text-[10px] font-medium text-slate-400">{c.dial}</span></div>
-                          {selectedCountry.code === c.code && <Check size={14} className="ml-auto text-blue-600" />}
-                        </button>
+                        <button key={c.code} onClick={() => { setSelectedCountry(c); setIsCountryDropdownOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-blue-50 transition-colors text-left border-b border-slate-50 last:border-0"><span className="text-2xl">{c.flag}</span><div className="flex flex-col"><span className="text-xs font-bold text-slate-900">{c.name}</span><span className="text-[10px] font-medium text-slate-400">{c.dial}</span></div>{selectedCountry.code === c.code && <Check size={14} className="ml-auto text-blue-600" />}</button>
                       ))}
                     </div>
                   )}
@@ -279,6 +259,9 @@ export const P2PreCheckoutModal: React.FC<P2PreCheckoutModalProps> = ({ onClose,
               </div>
             </div>
 
+            <p className="text-[11px] font-bold text-blue-900 text-center -mt-2 uppercase tracking-tighter">{t.mandatory_hint}</p>
+
+            {/* Блок семьи - ВОССТАНОВЛЕНО ПОЛНОСТЬЮ */}
             <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
               <div className="flex items-center justify-between mb-4"><span className="text-xs font-black text-slate-900 uppercase tracking-widest">{t.family.title}</span><button onClick={() => setIsFamilyActive(!isFamilyActive)} className={`w-12 h-6 rounded-full transition-colors relative ${isFamilyActive ? 'bg-blue-900' : 'bg-slate-300'}`}><div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${isFamilyActive ? 'left-7' : 'left-1'}`}></div></button></div>
               {isFamilyActive && (
@@ -290,23 +273,22 @@ export const P2PreCheckoutModal: React.FC<P2PreCheckoutModalProps> = ({ onClose,
               )}
             </div>
 
-            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
-              <span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">{t.credits.title}</span>
-              <div className="space-y-2">
-                <label className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-100 cursor-pointer hover:border-blue-900/30 transition-all">
-                  <div className="flex items-center gap-3"><input type="checkbox" checked={selectedCredits.includes(1)} onChange={() => setSelectedCredits(prev => prev.includes(1) ? prev.filter(x => x !== 1) : [...prev, 1])} className="w-5 h-5 rounded text-blue-900" /><span className="text-[11px] font-bold">{t.credits.p1_label}</span></div>
-                  <span className="text-[11px] font-black text-slate-400">−124.50 €</span>
-                </label>
-              </div>
+            {/* Зачеты - ВОССТАНОВЛЕНО ПОЛНОСТЬЮ */}
+            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+              <span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">{t.credits.title}</span>
+              {[ { id: 1, l: t.credits.p1_label, a: 124.5 } ].map(c => (
+                <label key={c.id} className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-100 cursor-pointer hover:border-blue-900/30 transition-all"><div className="flex items-center gap-3"><input type="checkbox" checked={selectedCredits.includes(c.id)} onChange={() => setSelectedCredits(prev => prev.includes(c.id) ? prev.filter(x => x !== c.id) : [...prev, c.id])} className="w-5 h-5 rounded text-blue-900" /><span className="text-[11px] font-bold">{c.l}</span></div><span className="text-[11px] font-black text-slate-400">−{c.a.toFixed(2)} €</span></label>
+              ))}
             </div>
 
+            {/* Резюме по цене - ВОССТАНОВЛЕНО ПОЛНОСТЬЮ */}
             <div className="p-5 bg-blue-50/50 border border-blue-100 rounded-2xl space-y-3">
-              <div className="flex justify-between text-[11px] text-slate-500 font-bold uppercase tracking-wider"><span>{t.summary.base}</span><span>{pricing.targetPackage.basePrice.toFixed(2)} €</span></div>
+              <div className="flex justify-between text-[11px] text-slate-500 font-bold uppercase tracking-wider"><span>{t.summary.base}</span><span>{PriceService.calculateUpgrade(2, [], 0).targetPackage.basePrice.toFixed(2)} €</span></div>
               {pricing.appliedCredits.map((c, i) => (<div key={i} className="flex justify-between text-[11px] text-emerald-600 font-bold uppercase tracking-wider"><span>{t.credits.p1_summary}</span><span>−{c.amount.toFixed(2)} €</span></div>))}
               {pricing.familyTariff > 0 && (
                 <div className="space-y-1.5 pt-2 border-t border-blue-100/50">
-                  <div className="flex justify-between text-[11px] text-slate-500 font-bold uppercase tracking-wider"><span>{t.summary.family_base}</span><span>+{(pricing.targetPackage.basePrice * 0.5).toFixed(2)} €</span></div>
-                  {extraMembers > 2 && (<div className="flex justify-between text-[11px] text-slate-500 font-bold uppercase tracking-wider"><span>{t.summary.family_extra} ({extraMembers - 2} {t.summary.person_short})</span><span>+{(pricing.familyTariff - pricing.targetPackage.basePrice * 0.5).toFixed(2)} €</span></div>)}
+                  <div className="flex justify-between text-[11px] text-slate-500 font-bold uppercase tracking-wider"><span>{t.summary.family_base}</span><span>+{(PriceService.calculateUpgrade(2, [], 0).targetPackage.basePrice * 0.5).toFixed(2)} €</span></div>
+                  {extraMembers > 2 && (<div className="flex justify-between text-[11px] text-slate-500 font-bold uppercase tracking-wider"><span>{t.summary.family_extra} ({extraMembers - 2} {t.summary.person_short})</span><span>+{(pricing.familyTariff - PriceService.calculateUpgrade(2, [], 0).targetPackage.basePrice * 0.5).toFixed(2)} €</span></div>)}
                   <div className="flex justify-between text-[11px] text-blue-900 font-black uppercase tracking-widest pt-1"><span>{t.summary.family_total}</span><span>+{pricing.familyTariff.toFixed(2)} €</span></div>
                 </div>
               )}
@@ -314,46 +296,28 @@ export const P2PreCheckoutModal: React.FC<P2PreCheckoutModalProps> = ({ onClose,
             </div>
 
             <div className="space-y-4">
-              <div className="text-center px-4"><p className="text-[12px] font-bold text-blue-900 leading-relaxed uppercase tracking-tighter">{t.offer_scope}</p></div>
-              
+              <div className="text-center px-4"><p className="text-[12px] font-bold text-blue-900 uppercase tracking-tighter">{t.offer_scope}</p></div>
               <div className="space-y-3">
-                {/* Чекбокс A */}
                 <div className={`p-4 rounded-xl border transition-all ${showValidationErrors && !consentA ? 'border-red-500 bg-red-50 animate-shake' : consentA ? 'border-emerald-500 bg-emerald-50/30' : 'border-slate-200 bg-white'}`}>
                   <label className="flex items-start gap-3 cursor-pointer group">
                     <input type="checkbox" checked={consentA} onChange={e => setConsentA(e.target.checked)} className={`mt-1 w-5 h-5 rounded shrink-0 transition-all ${consentA ? 'text-emerald-600 border-emerald-500' : 'text-blue-900 border-slate-300'}`} />
-                    <span className={`text-[11px] font-medium leading-relaxed transition-colors ${showValidationErrors && !consentA ? 'text-red-700' : consentA ? 'text-emerald-700' : 'text-slate-700 group-hover:text-blue-900'}`}>
-                      {language === 'de' ? (
-                        <>Ich akzeptiere die <DocLink code="AGB" text="AGB" /> <DownloadIcon code="AGB" />, die <DocLink code="MANDAT" text="Mandatsvereinbarung" /> <DownloadIcon code="MANDAT" /> sowie die <DocLink code="RVG" text="Honorarvereinbarung (§ 3a RVG)" /> <DownloadIcon code="RVG" />.</>
-                      ) : language === 'ua' ? (
-                        <>Я приймаю <DocLink code="AGB" text="AGB" /> <DownloadIcon code="AGB" />, <DocLink code="MANDAT" text="Договір доручення" /> <DownloadIcon code="MANDAT" />, а також <DocLink code="RVG" text="Гонорарну угоду" /> (§ 3a RVG) <DownloadIcon code="RVG" />.</>
-                      ) : (
-                        <>Я принимаю <DocLink code="AGB" text="AGB" /> <DownloadIcon code="AGB" />, <DocLink code="MANDAT" text="Договор поручения" /> <DownloadIcon code="MANDAT" />, а также <DocLink code="RVG" text="Гонорарное соглашение" /> (§ 3a RVG) <DownloadIcon code="RVG" />.</>
-                      )}
+                    <span className={`text-[11px] font-medium leading-relaxed transition-colors ${consentA ? 'text-emerald-700' : 'text-slate-700 group-hover:text-blue-900'}`}>
+                      {language === 'de' ? (<>Ich akzeptiere die <DocLink code="AGB" text="AGB" />, die <DocLink code="MANDAT" text="Mandatsvereinbarung" /> sowie die <DocLink code="RVG" text="Honorarvereinbarung (§ 3a RVG)" />.</>) : language === 'ua' ? (<>Я приймаю <DocLink code="AGB" text="AGB" />, <DocLink code="MANDAT" text="Договір доручення" />, а також <DocLink code="RVG" text="Гонорарну угоду" /> (§ 3a RVG).</>) : (<>Я принимаю <DocLink code="AGB" text="AGB" />, <DocLink code="MANDAT" text="Договор поручения" />, а также <DocLink code="RVG" text="Гонорарное соглашение" /> (§ 3a RVG).</>)}
                     </span>
                   </label>
                 </div>
-
-                {/* Чекбокс B */}
                 <div className={`p-4 rounded-xl border transition-all ${showValidationErrors && !consentB ? 'border-red-500 bg-red-50 animate-shake' : consentB ? 'border-emerald-500 bg-emerald-50/30' : 'border-slate-200 bg-white'}`}>
                   <label className="flex items-start gap-3 cursor-pointer group">
                     <input type="checkbox" checked={consentB} onChange={e => setConsentB(e.target.checked)} className={`mt-1 w-5 h-5 rounded shrink-0 transition-all ${consentB ? 'text-emerald-600 border-emerald-500' : 'text-blue-900 border-slate-300'}`} />
-                    <span className={`text-[11px] font-medium leading-relaxed transition-colors ${showValidationErrors && !consentB ? 'text-red-700' : consentB ? 'text-emerald-700' : 'text-slate-700 group-hover:text-blue-900'}`}>
-                      {language === 'de' ? (
-                        <>Ich verlange ausdrücklich <DocLink code="EXECUTION" text="die sofortige Aufnahme der Tätigkeit" /> <DownloadIcon code="EXECUTION" /> und weiß, dass mein <DocLink code="WIDERRUF" text="Widerrufsrecht" /> gemäß § 356 Abs. 4 BGB erlischt <DownloadIcon code="WIDERRUF" />.</>
-                      ) : language === 'ua' ? (
-                        <>Я прямо запитую <DocLink code="EXECUTION" text="негайний початок робіт" /> <DownloadIcon code="EXECUTION" /> і знаю, що моє <DocLink code="WIDERRUF" text="право на відкликання" /> припиняється відповідно до § 356 Abs. 4 BGB <DownloadIcon code="WIDERRUF" />.</>
-                      ) : (
-                        <>Я прямо запрашиваю <DocLink code="EXECUTION" text="немедленное начало работ" /> <DownloadIcon code="EXECUTION" /> и знаю, что моё <DocLink code="WIDERRUF" text="право на отзыв" /> прекращается в соответствии с § 356 Abs. 4 BGB <DownloadIcon code="WIDERRUF" />.</>
-                      )}
+                    <span className={`text-[11px] font-medium leading-relaxed transition-colors ${consentB ? 'text-emerald-700' : 'text-slate-700 group-hover:text-blue-900'}`}>
+                      {language === 'de' ? (<>Ich verlange ausdrücklich <DocLink code="EXECUTION" text="die sofortige Aufnahme der Tätigkeit" /> und weiß, dass mein <DocLink code="WIDERRUF" text="Widerrufsrecht" /> gemäß § 356 Abs. 4 BGB erlischt.</>) : language === 'ua' ? (<>Я прямо запитую <DocLink code="EXECUTION" text="негайний початок робіт" /> і знаю, що моє <DocLink code="WIDERRUF" text="право на відкликання" /> припиняється відповідно до § 356 Abs. 4 BGB.</>) : (<>Я прямо запрашиваю <DocLink code="EXECUTION" text="немедленное начало работ" /> и знаю, что моё <DocLink code="WIDERRUF" text="право на отзыв" /> прекращается в соответствии с § 356 Abs. 4 BGB.</>)}
                     </span>
                   </label>
                 </div>
               </div>
-
-              <div className="text-center pt-2"><button onClick={() => setActiveDoc('PRIVACY')} className="text-[10px] font-bold text-blue-700 hover:text-blue-900 transition-colors uppercase tracking-widest underline">{t.privacy_link}</button></div>
+              <div className="text-center pt-2"><button onClick={() => setActiveDoc('PRIVACY')} className="text-[10px] font-bold text-blue-700 hover:text-blue-900 uppercase tracking-widest underline">{t.privacy_link}</button></div>
               <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100 flex gap-3"><Info size={16} className="text-blue-900 shrink-0" /><p className="text-[11px] font-bold text-blue-900 leading-tight">{t.p1_precondition}</p></div>
             </div>
-
             {serverError && <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-100 rounded-xl text-red-800 animate-in fade-in"><AlertCircle size={18} className="shrink-0 mt-0.5" /><p className="text-xs font-medium leading-relaxed">{serverError}</p></div>}
             <button onClick={handleProceed} disabled={isChecking} className={`w-full h-14 rounded-full font-black text-[13px] uppercase tracking-widest shadow-xl flex items-center justify-center gap-3 transition-all ${isFormValid && areLegalsValid ? 'bg-blue-900 text-white active:scale-95' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}>{isChecking ? (<><Loader2 size={18} className="animate-spin" /> {t.loading}</>) : (<>{t.button} <ArrowRight size={18} /></>)}</button>
           </div>
@@ -364,7 +328,13 @@ export const P2PreCheckoutModal: React.FC<P2PreCheckoutModalProps> = ({ onClose,
         <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm animate-in fade-in" onClick={() => setActiveDoc(null)}></div>
           <div className="relative bg-white w-full max-w-2xl max-h-[85vh] rounded-2xl shadow-2xl flex flex-col animate-in zoom-in-95">
-            <div className="flex items-center justify-between p-6 border-b border-slate-100"><div className="flex items-center gap-3 text-blue-900"><File size={20} /><h3 className="font-bold text-lg">{(DOCS as any)[activeDoc]?.title}</h3></div><button onClick={() => setActiveDoc(null)} className="p-2 hover:bg-slate-100 rounded-full transition-colors"><X size={20} /></button></div>
+            <div className="flex items-center justify-between p-6 border-b border-slate-100">
+              <div className="flex items-center gap-3 text-blue-900"><File size={20} /><h3 className="font-bold text-lg">{(DOCS as any)[activeDoc]?.title}</h3></div>
+              <div className="flex items-center gap-2">
+                <button onClick={(e) => { e.preventDefault(); alert(`Download: ${activeDoc}.pdf`); }} className="p-2 text-blue-900 hover:bg-blue-50 rounded-full transition-colors" title={t.btn_download}><Download size={20} /></button>
+                <button onClick={() => setActiveDoc(null)} className="p-2 hover:bg-slate-100 rounded-full transition-colors"><X size={20} /></button>
+              </div>
+            </div>
             <div className="p-8 overflow-y-auto custom-scrollbar leading-relaxed text-slate-600 text-sm">{(DOCS as any)[activeDoc]?.content}</div>
             <div className="p-6 border-t border-slate-100 bg-slate-50/50 rounded-b-2xl"><button onClick={() => setActiveDoc(null)} className="w-full py-3 bg-blue-900 text-white rounded-xl font-bold uppercase tracking-wider hover:bg-blue-800 transition-colors">{t.btn_close}</button></div>
           </div>
